@@ -1,6 +1,12 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { createAuthService } from "./auth.service";
-import type { Register, Login, OauthLogin, InstagramUser } from "@/types";
+import type {
+  Register,
+  Login,
+  OauthLogin,
+  InstagramUser,
+  RefreshToken,
+} from "@/types";
 import { OAuth2Namespace } from "@fastify/oauth2";
 
 export function createAuthController(
@@ -80,7 +86,7 @@ export function createAuthController(
         provider: "google",
       });
       // 4. Gerar e retornar o JWT
-      const token = user.token;
+      const token = user.credentials.token;
       return reply
         .status(200)
         .send({ token: token, message: "Login efetuado com sucesso" });
@@ -105,7 +111,7 @@ export function createAuthController(
         method: "GET",
         headers: {
           Authorization: `Bearer ${githubToken.token.access_token}`,
-          "User-Agent": "auth-api"
+          "User-Agent": "auth-api",
         },
       });
       const data = (await response.json()) as OauthLogin;
@@ -117,7 +123,7 @@ export function createAuthController(
         provider: "github",
       });
       // 4. Gerar e retornar o JWT
-      const token = user.token;
+      const token = user.credentials.token;
       return reply
         .status(200)
         .send({ token: token, message: "Login efetuado com sucesso" });
@@ -138,12 +144,15 @@ export function createAuthController(
         await oauth.facebook.getAccessTokenFromAuthorizationCodeFlow(request);
       //console.log("TOKEN COMPLETO:", JSON.stringify(googleToken, null, 2));
       // 2. Buscar o perfil do usuário no Google
-      const response = await fetch("https://graph.facebook.com/me?fields=id,name,email", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${facebookToken.token.access_token}`,
+      const response = await fetch(
+        "https://graph.facebook.com/me?fields=id,name,email",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${facebookToken.token.access_token}`,
+          },
         },
-      });
+      );
       const data = (await response.json()) as OauthLogin;
       // 3. Chamar service.handleOAuthUser(...)
       const user = await service.handleOAuthUser({
@@ -153,7 +162,7 @@ export function createAuthController(
         provider: "facebook",
       });
       // 4. Gerar e retornar o JWT
-      const token = user.token;
+      const token = user.credentials.token;
       return reply
         .status(200)
         .send({ token: token, message: "Login efetuado com sucesso" });
@@ -174,12 +183,15 @@ export function createAuthController(
         await oauth.instagram.getAccessTokenFromAuthorizationCodeFlow(request);
       //console.log("TOKEN COMPLETO:", JSON.stringify(googleToken, null, 2));
       // 2. Buscar o perfil do usuário no Google
-      const response = await fetch("https://graph.instagram.com/me?fields=id,username", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${instagramToken.token.access_token}`,
+      const response = await fetch(
+        "https://graph.instagram.com/me?fields=id,username",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${instagramToken.token.access_token}`,
+          },
         },
-      });
+      );
       const data = (await response.json()) as InstagramUser;
       // 3. Chamar service.handleOAuthUser(...)
       const user = await service.handleOAuthUser({
@@ -189,7 +201,7 @@ export function createAuthController(
         provider: "instagram",
       });
       // 4. Gerar e retornar o JWT
-      const token = user.token;
+      const token = user.credentials.token;
       return reply
         .status(200)
         .send({ token: token, message: "Login efetuado com sucesso" });
@@ -200,5 +212,27 @@ export function createAuthController(
     }
   }
 
-  return { register, login, googleCallBack, githubCallBack, facebookCallBack, instagramCallBack };
+  async function refreshToken(
+    request: FastifyRequest<{ Body: RefreshToken }>,
+    reply: FastifyReply,
+  ) {
+    try {
+      const { refreshToken } = request.body;
+      const newTokens = await service.refreshUserToken(refreshToken);
+      return reply.status(200).send( newTokens );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não autorizado";
+      return reply.status(403).send({ message: message });
+    }
+  }
+
+  return {
+    register,
+    login,
+    googleCallBack,
+    githubCallBack,
+    facebookCallBack,
+    instagramCallBack,
+    refreshToken
+  };
 }

@@ -14,6 +14,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
   fastify.post("/register", { schema: registerSchema }, controller.register);
   fastify.post("/login", { schema: loginSchema }, controller.login);
+  fastify.post("/refresh", controller.refreshToken);
   fastify.get("/google/callback", controller.googleCallBack);
   fastify.get("/github/callback", controller.githubCallBack);
   fastify.get("/facebook/callback", controller.facebookCallBack);

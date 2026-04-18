@@ -1,4 +1,3 @@
-
 import fp from "fastify-plugin";
 import jwt from "@fastify/jwt";
 
@@ -9,5 +8,5 @@ if (!JWT_SECRET) {
 }
 
 export const jwtPlugin = fp(async (fastify) => {
-  fastify.register(jwt, { secret: JWT_SECRET });
+  fastify.register(jwt, { secret: JWT_SECRET, sign: { expiresIn: "15m" } }); // Nesse trecho
 });

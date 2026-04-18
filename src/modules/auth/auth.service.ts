@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import jwtLib from "jsonwebtoken";
 
 export function createAuthService(
   prisma: PrismaClient,
   jwt: { sign: (payload: object) => string },
 ) {
-  
   async function registerUser(data: {
     email: string;
     password: string;
@@ -47,8 +47,9 @@ export function createAuthService(
       throw new Error("Credenciais inválidas");
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email });
-    return token;
+    const payload = { id: user.id, email: user.email };
+
+    return await generateAndSaveTokens(payload);
   }
 
   async function handleOAuthUser(data: {
@@ -66,8 +67,11 @@ export function createAuthService(
     if (existingUserWithProviderId) {
       const { password: _, ...userWithoutPassword } =
         existingUserWithProviderId;
-        const token = jwt.sign(userWithoutPassword);
-      return {user: userWithoutPassword, token};
+
+      return {
+        user: userWithoutPassword,
+        credentials: await generateAndSaveTokens(userWithoutPassword),
+      };
     } else {
       // 4. Se não existir → verificar se existe um usuário com aquele email
       const existingUSer = await prisma.user.findUnique({
@@ -79,18 +83,62 @@ export function createAuthService(
           where: { email: data.email },
           data: { ...data },
         });
-        const token = jwt.sign(updateUser)
-        return {user: updateUser, token};
+
+        return {
+          user: updateUser,
+          credentials: await generateAndSaveTokens(updateUser),
+        };
       } else {
         // 6. Se não existir → criar um novo usuário sem senha
         const { password: _, ...newUser } = await prisma.user.create({
           data: { ...data },
         });
-        const token = jwt.sign(newUser);
-        return {user: newUser, token};
+
+        return {
+          user: newUser,
+          credentials: await generateAndSaveTokens(newUser),
+        };
       }
     }
   }
 
-  return { registerUser, loginUser, handleOAuthUser };
+  async function generateAndSaveTokens(user: { id: string; email: string }) {
+    const token = jwt.sign({ id: user.id, email: user.email });
+    const refreshToken = jwtLib.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" },
+    );
+    await prisma.user.update({
+      where: { email: user.email },
+      data: { refreshToken },
+    });
+    return { token, refreshToken };
+  }
+
+  async function refreshUserToken(
+    refreshToken: string) {
+    const foundUser = await prisma.user.findUnique({
+      where: { refreshToken: refreshToken },
+    });
+
+    if (!foundUser) {
+      throw new Error("Token inválido");
+    }
+
+    try {
+      const decoded = jwtLib.verify(refreshToken, process.env.JWT_SECRET!) as jwtLib.JwtPayload;
+
+      const credentials = await generateAndSaveTokens({
+        id: decoded.id,
+        email: decoded.email,
+      });
+
+      return credentials;
+    } catch (error) {
+      throw new Error("Token expirado ou inválido");
+    }
+  }
+
+  return { registerUser, loginUser, handleOAuthUser, refreshUserToken };
 }

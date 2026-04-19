@@ -23,3 +23,7 @@ export type InstagramUser = { // precisei criar para corrigir conflitos de tipo.
 export type RefreshToken = {
   refreshToken: string
 }
+
+export type User = {
+  id: string
+}

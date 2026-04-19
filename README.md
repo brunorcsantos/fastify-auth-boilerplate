@@ -61,6 +61,7 @@ npm run dev
 |--------|------|-----------|
 | POST | `/auth/register` | Cadastro local |
 | POST | `/auth/login` | Login local |
+| POST | `/auth/refresh` | Renova access token |
 | GET | `/auth/google` | Login com Google |
 | GET | `/auth/github` | Login com GitHub |
 | GET | `/auth/facebook` | Login com Facebook |

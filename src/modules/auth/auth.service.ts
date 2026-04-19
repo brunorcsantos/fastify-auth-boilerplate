@@ -4,7 +4,7 @@ import jwtLib from "jsonwebtoken";
 
 export function createAuthService(
   prisma: PrismaClient,
-  jwt: { sign: (payload: object) => string },
+  jwt: { sign: (payload: {id: string, email: string}) => string },
 ) {
   async function registerUser(data: {
     email: string;

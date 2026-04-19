@@ -66,4 +66,4 @@ npm run dev
 | GET | `/auth/github` | Login com GitHub |
 | GET | `/auth/facebook` | Login com Facebook |
 | GET | `/auth/instagram` | Login com Instagram |
-| GET | `/users/me` | Retorna dados do usuário autenticado | 🔒
+| GET | `/users/me` | 🔒 Retorna dados do usuário autenticado |

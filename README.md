@@ -61,9 +61,11 @@ npm run dev
 |--------|------|-----------|
 | POST | `/auth/register` | Cadastro local |
 | POST | `/auth/login` | Login local |
+| POST | `/auth/logout` | Logout local |
 | POST | `/auth/refresh` | Renova access token |
 | GET | `/auth/google` | Login com Google |
 | GET | `/auth/github` | Login com GitHub |
 | GET | `/auth/facebook` | Login com Facebook |
 | GET | `/auth/instagram` | Login com Instagram |
 | GET | `/users/me` | 🔒 Retorna dados do usuário autenticado |
+| GET | `/users/profile` | 🔒 Atualiza dados do usuário autenticado |

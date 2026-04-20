@@ -6,6 +6,7 @@ import type {
   OauthLogin,
   InstagramUser,
   RefreshToken,
+  User,
 } from "@/types";
 import { OAuth2Namespace } from "@fastify/oauth2";
 
@@ -219,7 +220,21 @@ export function createAuthController(
     try {
       const { refreshToken } = request.body;
       const newTokens = await service.refreshUserToken(refreshToken);
-      return reply.status(200).send( newTokens );
+      return reply.status(200).send(newTokens);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não autorizado";
+      return reply.status(403).send({ message: message });
+    }
+  }
+
+  async function logout(
+    request: FastifyRequest,
+    reply: FastifyReply,
+  ) {
+    try {
+      const { id } = request.user;
+      const response = await service.logoutUser({ id });
+      return reply.status(200).send(response);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não autorizado";
       return reply.status(403).send({ message: message });
@@ -233,6 +248,7 @@ export function createAuthController(
     githubCallBack,
     facebookCallBack,
     instagramCallBack,
-    refreshToken
+    refreshToken,
+    logout
   };
 }

@@ -10,5 +10,6 @@ export async function usersRoutes(fastify: FastifyInstance) {
   fastify.register(async (protectedFastify) => {
     protectedFastify.addHook("preHandler", authenticate);
     protectedFastify.get("/me", controller.getMe);
+    protectedFastify.patch("/profile", controller.updateProfile);
   });
 }

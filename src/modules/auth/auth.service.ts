@@ -4,7 +4,7 @@ import jwtLib from "jsonwebtoken";
 
 export function createAuthService(
   prisma: PrismaClient,
-  jwt: { sign: (payload: {id: string, email: string}) => string },
+  jwt: { sign: (payload: { id: string; email: string }) => string },
 ) {
   async function registerUser(data: {
     email: string;
@@ -116,18 +116,22 @@ export function createAuthService(
     return { token, refreshToken };
   }
 
-  async function refreshUserToken(
-    refreshToken: string) {
+  async function refreshUserToken(refreshToken: string) {
     const foundUser = await prisma.user.findUnique({
       where: { refreshToken: refreshToken },
     });
+
+    console.log("foundUser:", foundUser);
 
     if (!foundUser) {
       throw new Error("Token inválido");
     }
 
     try {
-      const decoded = jwtLib.verify(refreshToken, process.env.JWT_SECRET!) as jwtLib.JwtPayload;
+      const decoded = jwtLib.verify(
+        refreshToken,
+        process.env.JWT_SECRET!,
+      ) as jwtLib.JwtPayload;
 
       const credentials = await generateAndSaveTokens({
         id: decoded.id,
@@ -140,5 +144,20 @@ export function createAuthService(
     }
   }
 
-  return { registerUser, loginUser, handleOAuthUser, refreshUserToken };
+  async function logoutUser(user: { id: string }) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: null },
+    });
+
+    return { message: "Logout efetuado com sucesso" };
+  }
+
+  return {
+    registerUser,
+    loginUser,
+    handleOAuthUser,
+    refreshUserToken,
+    logoutUser,
+  };
 }

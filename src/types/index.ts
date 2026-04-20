@@ -27,3 +27,9 @@ export type RefreshToken = {
 export type User = {
   id: string
 }
+
+export type UpdateProfile = {
+  name?: string;
+  currentPassword: string;
+  newPassword?: string;
+}

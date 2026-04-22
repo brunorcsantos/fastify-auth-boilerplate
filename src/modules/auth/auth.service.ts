@@ -17,7 +17,7 @@ export function createAuthService(
     });
 
     if (existing) {
-      throw new Error("Email já cadastrado");
+      throw new Error("E-mail já cadastrado");
     }
     // 2. criptografar a senha → bcrypt.hash(senha, 10)
     const passwordHash = await bcrypt.hash(data.password, 10);

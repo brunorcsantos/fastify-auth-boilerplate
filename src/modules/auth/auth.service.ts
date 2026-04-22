@@ -113,6 +113,7 @@ export function createAuthService(
       where: { email: user.email },
       data: { refreshToken },
     });
+    
     return { token, refreshToken };
   }
 

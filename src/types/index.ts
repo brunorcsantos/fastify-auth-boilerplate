@@ -15,7 +15,7 @@ export type OauthLogin = {
   name: string | "";
 };
 
-export type InstagramUser = { // precisei criar para corrigir conflitos de tipo.
+export type InstagramUser = { 
   id: string;
   username: string; 
 };

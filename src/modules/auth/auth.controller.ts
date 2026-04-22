@@ -47,11 +47,11 @@ export function createAuthController(
     const data = request.body;
     // 2. chamar service.loginUser(...)
     try {
-      const token = await service.loginUser(data);
+      const {token, refreshToken} = await service.loginUser(data);
       // 3. devolver status 200 com o token
       return reply
         .status(200)
-        .send({ token: token, message: "Login efetuado com sucesso" });
+        .send({ token: token,refreshToken: refreshToken, message: "Login efetuado com sucesso" });
     } catch (error) {
       // 4. tratar erros com try/catch
       const message = error instanceof Error ? error.message : "Erro interno";

@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { createAuthController } from "./auth.controller";
 import { createAuthService } from "./auth.service";
-import { registerSchema, loginSchema } from "./auth.schema";
+import { registerSchema, loginSchema, refreshSchema, logoutSchema, googleAuthSchema, githubAuthSchema, facebookAuthSchema, instagramAuthSchema } from "./auth.schema";
 import { authenticate } from "@/shared/middlewares/authenticate";
 
 export async function authRoutes(fastify: FastifyInstance) {
@@ -15,15 +15,15 @@ export async function authRoutes(fastify: FastifyInstance) {
 
   fastify.register(async (protectedFastify) => {
     protectedFastify.addHook("preHandler", authenticate);
-    protectedFastify.post("/logout", controller.logout);
+    protectedFastify.post("/logout", { schema: logoutSchema }, controller.logout);
   });
 
   fastify.post("/register", { schema: registerSchema }, controller.register);
   fastify.post("/login", { schema: loginSchema }, controller.login);
-  fastify.post("/refresh", controller.refreshToken);
+  fastify.post("/refresh", { schema: refreshSchema }, controller.refreshToken);
 
-  fastify.get("/google/callback", controller.googleCallBack);
-  fastify.get("/github/callback", controller.githubCallBack);
-  fastify.get("/facebook/callback", controller.facebookCallBack);
-  fastify.get("/instagram/callback", controller.instagramCallBack);
+  fastify.get("/google/callback", { schema: googleAuthSchema },controller.googleCallBack);
+  fastify.get("/github/callback", { schema: githubAuthSchema },controller.githubCallBack);
+  fastify.get("/facebook/callback", { schema: facebookAuthSchema },controller.facebookCallBack);
+  fastify.get("/instagram/callback", { schema: instagramAuthSchema },controller.instagramCallBack);
 }

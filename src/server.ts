@@ -6,6 +6,7 @@ import { authRoutes } from "./modules/auth/auth.routes";
 import { oauthPlugin } from "./plugins/oauth";
 import { usersRoutes } from "./modules/users/user.routes";
 import { corsPlugin } from "./plugins/cors";
+import { swaggerPlugin } from "./plugins/swagger";
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -19,6 +20,7 @@ const start = async () => {
     await fastify.register(prismaPlugin);
     await fastify.register(jwtPlugin);
     await fastify.register(oauthPlugin);
+    await fastify.register(swaggerPlugin);
     await fastify.register(authRoutes, { prefix: "/auth" });
     await fastify.register(usersRoutes, { prefix: "/users" });
     await fastify.listen({ port: PORT });

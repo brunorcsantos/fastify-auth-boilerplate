@@ -5,6 +5,7 @@ export async function authenticate(
   reply: FastifyReply,
 ) {
   try {
+    console.log(request.headers)
     await request.jwtVerify();
   } catch (error) {
     return reply.status(401).send({ message: "Não autorizado" });

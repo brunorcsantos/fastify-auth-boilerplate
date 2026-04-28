@@ -18,6 +18,12 @@ export const registerSchema = {
         id: { type: "string" },
         email: { type: "string" },
         name: { type: "string" },
+        provider: { type: "string" },
+        providerId: { type: "string" },
+        createdAt: { type: "string" },
+        updatedAt: { type: "string" },
+        token: { type: "string" },
+        refreshToken: { type: "string" },
         message: { type: "string" },
       },
     },
@@ -40,15 +46,23 @@ export const loginSchema = {
     properties: {
       email: { type: "string", format: "email" },
       password: { type: "string" },
-    }
+    },
   },
   response: {
     200: {
       description: "Login efetuado com sucesso",
       type: "object",
       properties: {
+        id: { type: "string" },
+        email: { type: "string" },
+        name: { type: "string" },
+        provider: { type: "string" },
+        providerId: { type: "string" },
+        createdAt: { type: "string" },
+        updatedAt: { type: "string" },
         token: { type: "string" },
         refreshToken: { type: "string" },
+        message: { type: "string" },
       },
     },
     400: {
@@ -68,8 +82,8 @@ export const refreshSchema = {
     type: "object",
     required: ["refreshToken"],
     properties: {
-      refreshToken : {type: "string"},
-    }
+      refreshToken: { type: "string" },
+    },
   },
   response: {
     200: {
@@ -88,7 +102,7 @@ export const refreshSchema = {
       },
     },
   },
-}
+};
 
 export const logoutSchema = {
   tags: ["Auth"],
@@ -110,7 +124,7 @@ export const logoutSchema = {
       },
     },
   },
-}
+};
 
 export const googleAuthSchema = {
   tags: ["OAuth"],
@@ -167,6 +181,3 @@ export const instagramAuthSchema = {
     },
   },
 };
-
-
-

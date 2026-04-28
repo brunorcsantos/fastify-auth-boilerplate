@@ -27,7 +27,11 @@ export function createAuthService(
       data: { ...data, password: passwordHash },
     });
     // 4. retornar o usuário sem a senha
-    return userWithoutPassword;
+    const tokens = await generateAndSaveTokens({
+      id: userWithoutPassword.id,
+      email: userWithoutPassword.email,
+    });
+    return {...userWithoutPassword, ...tokens};
   }
 
   async function loginUser(data: { email: string; password: string }) {
@@ -47,9 +51,13 @@ export function createAuthService(
       throw new Error("Credenciais inválidas");
     }
 
-    const payload = { id: user.id, email: user.email };
+    const tokens = await generateAndSaveTokens({
+      id: user.id,
+      email: user.email,
+    });
+    const { password: _, ...userWithoutPassword } = user;
 
-    return await generateAndSaveTokens(payload);
+    return { ...userWithoutPassword, ...tokens };
   }
 
   async function handleOAuthUser(data: {
@@ -113,7 +121,7 @@ export function createAuthService(
       where: { email: user.email },
       data: { refreshToken },
     });
-    
+
     return { token, refreshToken };
   }
 

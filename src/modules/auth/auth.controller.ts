@@ -28,6 +28,7 @@ export function createAuthController(
     // 2. chamar service.registerUser(...)
     try {
       const newUser = await service.registerUser(data);
+      console.log(newUser)
       // 3. devolver status 201 com o usuário criado
       reply
         .status(201)
@@ -47,11 +48,11 @@ export function createAuthController(
     const data = request.body;
     // 2. chamar service.loginUser(...)
     try {
-      const {token, refreshToken} = await service.loginUser(data);
+      const user = await service.loginUser(data);
       // 3. devolver status 200 com o token
       return reply
         .status(200)
-        .send({ token: token,refreshToken: refreshToken, message: "Login efetuado com sucesso" });
+        .send({ ...user, message: "Login efetuado com sucesso" });
     } catch (error) {
       // 4. tratar erros com try/catch
       const message = error instanceof Error ? error.message : "Erro interno";
@@ -227,10 +228,7 @@ export function createAuthController(
     }
   }
 
-  async function logout(
-    request: FastifyRequest,
-    reply: FastifyReply,
-  ) {
+  async function logout(request: FastifyRequest, reply: FastifyReply) {
     try {
       const { id } = request.user;
       const response = await service.logoutUser({ id });
@@ -249,6 +247,6 @@ export function createAuthController(
     facebookCallBack,
     instagramCallBack,
     refreshToken,
-    logout
+    logout,
   };
 }

@@ -69,3 +69,10 @@ npm run dev
 | GET | `/auth/instagram` | Login com Instagram |
 | GET | `/users/me` | 🔒 Retorna dados do usuário autenticado |
 | GET | `/users/profile` | 🔒 Atualiza dados do usuário autenticado |
+
+## Documentação
+
+Com o servidor rodando, acesse:
+```
+http://localhost:3000/docs
+```

@@ -28,39 +28,41 @@ export function createUsersService(prisma: PrismaClient) {
   async function updateProfile(data: {
     id: string;
     name?: string;
-    currentPassword: string;
+    currentPassword?: string;
     newPassword?: string;
   }) {
     const user = await prisma.user.findUnique({ where: { id: data.id } });
+    const updateData: { name?: string; password?: string } = {};
 
     if (!user) {
       throw new Error("Usuário não encontrado");
     }
 
-    if (!user.password) {
-      throw new Error("Operação não permitida para contas OAuth");
-    } else {
-      const match = await bcrypt.compare(data.currentPassword, user.password);
+    if (data.name) {
+      updateData.name = data.name;
 
-      if (match) {
-        const updateData: { name?: string; password?: string } = {};
-        if (data.name) updateData.name = data.name;
-        if (data.currentPassword && data.newPassword) {
-          const newHashPassword = await bcrypt.hash(data.newPassword, 10);
-
-          updateData.password = newHashPassword;
-        }
-
-        await prisma.user.update({
-          where: { id: data.id },
-          data: updateData,
-        });
-      } else {
-        throw new Error("Credenciais inválidas");
-      }
     }
 
-    return { message: "Dados atualizados" };
+    if (data.newPassword) {
+      if (!user.password) {
+        throw new Error("Operação não permitida para contas OAuth");
+      }
+      const match = await bcrypt.compare(data.currentPassword!, user.password);
+
+      if (!match) {
+        throw new Error("Credenciais inválidas");
+      }
+      const newHashPassword = await bcrypt.hash(data.newPassword, 10);
+
+      updateData.password = newHashPassword;
+
+    }
+    const updatedUser = await prisma.user.update({
+      where: { id: data.id },
+      data: updateData,
+    });
+
+    return { message: "Dados atualizados", user: updatedUser };
   }
   return { getMe, updateProfile };
 }

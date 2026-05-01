@@ -96,7 +96,9 @@ describe("updateProfile", () => {
     };
 
     const result = await service.updateProfile(data);
-    expect(result).toEqual({ message: "Dados atualizados" });
+    expect(result).toHaveProperty("message", "Dados atualizados");
+    expect(result).toHaveProperty("user");
+    expect(result.user).toHaveProperty("name", "Usuário");
   });
   // Usuário OAuth tentando atualizar
   it("deve retornar erro para usuário OAuth tentando atualizar senha", async () => {

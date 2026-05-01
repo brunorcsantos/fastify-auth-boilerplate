@@ -10,6 +10,13 @@ export const userSchema = {
         id: { type: "string" },
         email: { type: "string" },
         name: { type: "string" },
+        provider: { type: "string" },
+        providerId: { type: "string" },
+        createdAt: { type: "string" },
+        updatedAt: { type: "string" },
+        token: { type: "string" },
+        refreshToken: { type: "string" },
+        message: { type: "string" },
       },
     },
     400: {
@@ -37,11 +44,11 @@ export const updateProfileSchema = {
     type: "object",
     required: ["currentPassword"],
     properties: {
-      id: {type: "string"},
-      name: {type: "string"},
-      currentPassword: {type: "string"},
-      newPassword: {type: "string"},
-    }
+      id: { type: "string" },
+      name: { type: "string" },
+      currentPassword: { type: "string" },
+      newPassword: { type: "string" },
+    },
   },
   response: {
     200: {
@@ -49,6 +56,18 @@ export const updateProfileSchema = {
       type: "object",
       properties: {
         message: { type: "string" },
+        user: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            email: { type: "string" },
+            name: { type: "string" },
+            provider: { type: "string" },
+            providerId: { type: "string" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+          },
+        },
       },
     },
     400: {
